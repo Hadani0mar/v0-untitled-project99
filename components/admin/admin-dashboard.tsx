@@ -11,6 +11,7 @@ import ProfileForm from "./profile-form"
 import SkillsManager from "./skills-manager"
 import ProjectsManager from "./projects-manager"
 import SocialLinksManager from "./social-links-manager"
+import AiInstructionsManager from "./ai-instructions-manager"
 
 interface AdminDashboardProps {
   profile: Profile
@@ -58,11 +59,12 @@ export default function AdminDashboard({ profile, skills, projects, socialLinks 
 
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-4 w-full max-w-3xl mx-auto">
+          <TabsList className="grid grid-cols-5 w-full max-w-4xl mx-auto">
             <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
             <TabsTrigger value="skills">المهارات</TabsTrigger>
             <TabsTrigger value="projects">المشاريع</TabsTrigger>
             <TabsTrigger value="social">روابط التواصل</TabsTrigger>
+            <TabsTrigger value="ai">الذكاء الاصطناعي</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-4">
@@ -79,6 +81,10 @@ export default function AdminDashboard({ profile, skills, projects, socialLinks 
 
           <TabsContent value="social" className="space-y-4">
             <SocialLinksManager socialLinks={socialLinks} />
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-4">
+            <AiInstructionsManager />
           </TabsContent>
         </Tabs>
       </main>

@@ -7,6 +7,7 @@ import Contact from "@/components/contact"
 import ChatButton from "@/components/chat-button"
 import ThemeToggle from "@/components/theme-toggle"
 import ScrollToTop from "@/components/scroll-to-top"
+import WelcomeMessage from "@/components/welcome-message"
 import JsonLd from "@/components/json-ld"
 import type { Profile, Skill, Project, SocialLink } from "@/lib/types"
 import type { Metadata } from "next"
@@ -47,6 +48,7 @@ export default async function Home() {
       <JsonLd profile={profile} skills={skills} projects={projects} socialLinks={socialLinks} />
       <ThemeToggle />
       <ScrollToTop />
+      <WelcomeMessage />
       <main className="min-h-screen">
         <Hero profile={profile} socialLinks={socialLinks} />
         <About profile={profile} />

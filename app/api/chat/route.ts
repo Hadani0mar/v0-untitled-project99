@@ -1,10 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
 import { groq } from "@ai-sdk/groq"
+import { createServerClient } from "@/lib/supabase/server"
 
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
+    const supabase = createServerClient()
+
+    // جلب تعليمات الذكاء الاصطناعي
+    const { data: aiData, error: aiError } = await supabase.from("ai_instructions").select("instructions").single()
+
+    let systemPrompt =
+      "أنت مساعد ذكي يدعى Mousa AI. أنت تمثل موسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية."
+
+    if (!aiError && aiData) {
+      systemPrompt = aiData.instructions
+    }
 
     // تحقق من وجود مفتاح API لـ Groq
     if (!process.env.GROQ_API_KEY) {
@@ -17,10 +29,13 @@ export async function POST(req: NextRequest) {
     // استخدام generateText من AI SDK
     const { text } = await generateText({
       model: groq("llama3-70b-8192"),
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+        })),
+      ],
     })
 
     return NextResponse.json({ message: text })

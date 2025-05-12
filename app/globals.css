@@ -111,6 +111,33 @@
   @apply bg-gray-900/30 border-gray-700/30;
 }
 
+/* Glass Name Effect */
+.glass-name {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 0.5rem 1rem;
+  color: #3b82f6;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  transform: perspective(500px) rotateX(5deg);
+  transition: all 0.3s ease;
+}
+
+.glass-name:hover {
+  transform: perspective(500px) rotateX(0);
+  box-shadow: 0 10px 40px 0 rgba(31, 38, 135, 0.5);
+}
+
+.dark .glass-name {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(30, 41, 59, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #60a5fa;
+}
+
 /* RTL Support */
 [dir="rtl"] .skill-progress {
   @apply bg-gradient-to-l from-blue-500 to-purple-600;

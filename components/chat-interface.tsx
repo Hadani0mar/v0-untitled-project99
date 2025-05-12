@@ -14,14 +14,10 @@ interface Message {
 }
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "مرحبًا! أنا Groq AI. كيف يمكنني مساعدتك اليوم؟",
-    },
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -31,6 +27,39 @@ export default function ChatInterface() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  // جلب تعليمات الذكاء الاصطناعي عند تحميل المكون
+  useEffect(() => {
+    const fetchAiInstructions = async () => {
+      try {
+        const response = await fetch("/api/ai/instructions")
+        const data = await response.json()
+
+        if (response.ok) {
+          setMessages([
+            {
+              role: "assistant",
+              content: "مرحبًا! أنا Mousa AI. كيف يمكنني مساعدتك اليوم؟",
+            },
+          ])
+          setIsInitialized(true)
+        }
+      } catch (error) {
+        console.error("خطأ في جلب تعليمات الذكاء الاصطناعي:", error)
+        setMessages([
+          {
+            role: "assistant",
+            content: "مرحبًا! أنا Mousa AI. كيف يمكنني مساعدتك اليوم؟",
+          },
+        ])
+        setIsInitialized(true)
+      }
+    }
+
+    if (!isInitialized) {
+      fetchAiInstructions()
+    }
+  }, [isInitialized])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

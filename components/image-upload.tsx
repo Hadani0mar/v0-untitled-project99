@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
@@ -25,28 +25,6 @@ export default function ImageUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)
   const { toast } = useToast()
-
-  // تهيئة الدلو عند تحميل المكون
-  useEffect(() => {
-    const initBucket = async () => {
-      try {
-        // محاولة إنشاء الدلو (سيتم تجاهل الخطأ إذا كان موجودًا بالفعل)
-        const { error } = await supabase.storage.createBucket(bucketName, {
-          public: true,
-        })
-
-        if (error && !error.message.includes("already exists")) {
-          console.error(`خطأ في إنشاء الدلو ${bucketName}:`, error)
-        } else {
-          console.log(`تم التحقق من وجود الدلو ${bucketName}`)
-        }
-      } catch (error) {
-        console.error(`خطأ في تهيئة الدلو ${bucketName}:`, error)
-      }
-    }
-
-    initBucket()
-  }, [bucketName])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
