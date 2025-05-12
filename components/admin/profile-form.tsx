@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import ImageUpload from "@/components/image-upload"
-import { ensureBucketExists } from "@/lib/supabase/storage"
+import { Save, Mail } from "lucide-react"
 
 interface ProfileFormProps {
   profile: Profile
@@ -50,9 +50,6 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
     setIsLoading(true)
 
     try {
-      // التأكد من وجود دلو الصور الشخصية قبل الحفظ
-      await ensureBucketExists("profile-images")
-
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -82,14 +79,14 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
   }
 
   return (
-    <Card className="border-none shadow-lg">
-      <CardHeader>
-        <CardTitle>تعديل الملف الشخصي</CardTitle>
+    <Card className="border-none shadow-lg overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 pb-8">
+        <CardTitle className="text-2xl">تعديل الملف الشخصي</CardTitle>
         <CardDescription>تحديث معلوماتك الشخصية وحالة التوفر</CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="mb-6">
+      <CardContent className="p-6 md:p-8 space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="mb-8">
             <ImageUpload
               onUploadComplete={handleImageUpload}
               currentImageUrl={formData.avatar_url}
@@ -98,29 +95,78 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="name">الاسم</Label>
-            <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-base">
+                الاسم
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="h-12 text-base"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="title" className="text-base">
+                المسمى الوظيفي
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                className="h-12 text-base"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="title">المسمى الوظيفي</Label>
-            <Input id="title" name="title" value={formData.title} onChange={handleChange} required />
+          <div className="space-y-3">
+            <Label htmlFor="bio" className="text-base">
+              نبذة تعريفية
+            </Label>
+            <Textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              rows={6}
+              className="text-base resize-none"
+            />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="bio">نبذة تعريفية</Label>
-            <Textarea id="bio" name="bio" value={formData.bio} onChange={handleChange} rows={5} />
+          <div className="space-y-3">
+            <Label htmlFor="email" className="text-base">
+              البريد الإلكتروني للتواصل
+            </Label>
+            <div className="flex items-center">
+              <Mail className="h-5 w-5 ml-2 text-gray-500" />
+              <Input
+                id="email"
+                value="mousa.omar.com@gmail.com"
+                readOnly
+                className="h-12 text-base bg-gray-50 dark:bg-gray-800"
+              />
+            </div>
+            <p className="text-sm text-gray-500">هذا البريد الإلكتروني سيظهر في قسم التواصل</p>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
             <Switch id="is_available" checked={formData.is_available} onCheckedChange={handleSwitchChange} />
-            <Label htmlFor="is_available" className="mr-2">
+            <Label htmlFor="is_available" className="mr-2 text-base font-medium">
               متاح للعمل
             </Label>
+            <p className="mr-auto text-sm text-gray-500">
+              {formData.is_available ? "سيظهر للزوار أنك متاح للعمل" : "سيظهر للزوار أنك غير متاح للعمل حاليًا"}
+            </p>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full h-12 text-base flex items-center gap-2" disabled={isLoading}>
+            <Save className="h-5 w-5" />
             {isLoading ? "جاري الحفظ..." : "حفظ التغييرات"}
           </Button>
         </form>

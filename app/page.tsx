@@ -5,10 +5,10 @@ import Skills from "@/components/skills"
 import Projects from "@/components/projects"
 import Contact from "@/components/contact"
 import ChatButton from "@/components/chat-button"
-import ThemeToggle from "@/components/theme-toggle"
 import ScrollToTop from "@/components/scroll-to-top"
 import WelcomeMessage from "@/components/welcome-message"
 import JsonLd from "@/components/json-ld"
+import FixedHeader from "@/components/fixed-header"
 import type { Profile, Skill, Project, SocialLink } from "@/lib/types"
 import type { Metadata } from "next"
 
@@ -46,15 +46,15 @@ export default async function Home() {
   return (
     <>
       <JsonLd profile={profile} skills={skills} projects={projects} socialLinks={socialLinks} />
-      <ThemeToggle />
+      <FixedHeader profile={profile} />
       <ScrollToTop />
       <WelcomeMessage />
-      <main className="min-h-screen">
+      <main className="min-h-screen pt-16">
         <Hero profile={profile} socialLinks={socialLinks} />
         <About profile={profile} />
         <Skills skills={skills} />
         <Projects projects={projects} />
-        <Contact socialLinks={socialLinks} />
+        <Contact socialLinks={socialLinks} email="mousa.omar.com@gmail.com" />
         <ChatButton />
       </main>
     </>

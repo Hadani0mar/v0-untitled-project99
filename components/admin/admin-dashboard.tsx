@@ -6,12 +6,13 @@ import type { Profile, Skill, Project, SocialLink } from "@/lib/types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { LogOut } from "lucide-react"
+import { LogOut, User, Code, Briefcase, Link2, Bot } from "lucide-react"
 import ProfileForm from "./profile-form"
 import SkillsManager from "./skills-manager"
 import ProjectsManager from "./projects-manager"
 import SocialLinksManager from "./social-links-manager"
 import AiInstructionsManager from "./ai-instructions-manager"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface AdminDashboardProps {
   profile: Profile
@@ -24,6 +25,7 @@ export default function AdminDashboard({ profile, skills, projects, socialLinks 
   const [activeTab, setActiveTab] = useState("profile")
   const { toast } = useToast()
   const router = useRouter()
+  const isMobile = useMediaQuery("(max-width: 768px)")
 
   const handleLogout = async () => {
     try {
@@ -47,43 +49,82 @@ export default function AdminDashboard({ profile, skills, projects, socialLinks 
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold gradient-text">لوحة الإدارة</h1>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 ml-2" />
-            تسجيل الخروج
+      <header className="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-30">
+        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+          <h1 className="text-2xl md:text-3xl font-bold gradient-text">لوحة الإدارة</h1>
+          <Button
+            variant="outline"
+            size={isMobile ? "sm" : "default"}
+            onClick={handleLogout}
+            className="flex items-center gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">تسجيل الخروج</span>
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-5 w-full max-w-4xl mx-auto">
-            <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
-            <TabsTrigger value="skills">المهارات</TabsTrigger>
-            <TabsTrigger value="projects">المشاريع</TabsTrigger>
-            <TabsTrigger value="social">روابط التواصل</TabsTrigger>
-            <TabsTrigger value="ai">الذكاء الاصطناعي</TabsTrigger>
-          </TabsList>
+      <main className="container mx-auto px-4 py-8 md:py-12">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <TabsList className={`grid ${isMobile ? "grid-cols-3 gap-2 mb-4" : "grid-cols-5"} w-full`}>
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">الملف الشخصي</span>
+              </TabsTrigger>
+              <TabsTrigger value="skills" className="flex items-center gap-2">
+                <Code className="h-4 w-4" />
+                <span className="hidden sm:inline">المهارات</span>
+              </TabsTrigger>
+              <TabsTrigger value="projects" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                <span className="hidden sm:inline">المشاريع</span>
+              </TabsTrigger>
+              {isMobile ? null : (
+                <>
+                  <TabsTrigger value="social" className="flex items-center gap-2">
+                    <Link2 className="h-4 w-4" />
+                    <span className="hidden sm:inline">روابط التواصل</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="ai" className="flex items-center gap-2">
+                    <Bot className="h-4 w-4" />
+                    <span className="hidden sm:inline">الذكاء الاصطناعي</span>
+                  </TabsTrigger>
+                </>
+              )}
+            </TabsList>
 
-          <TabsContent value="profile" className="space-y-4">
+            {isMobile && (
+              <TabsList className="grid grid-cols-2 gap-2 w-full">
+                <TabsTrigger value="social" className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">روابط التواصل</span>
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  <span className="hidden sm:inline">الذكاء الاصطناعي</span>
+                </TabsTrigger>
+              </TabsList>
+            )}
+          </div>
+
+          <TabsContent value="profile" className="space-y-4 animate-in">
             <ProfileForm profile={profile} />
           </TabsContent>
 
-          <TabsContent value="skills" className="space-y-4">
+          <TabsContent value="skills" className="space-y-4 animate-in">
             <SkillsManager skills={skills} />
           </TabsContent>
 
-          <TabsContent value="projects" className="space-y-4">
+          <TabsContent value="projects" className="space-y-4 animate-in">
             <ProjectsManager projects={projects} />
           </TabsContent>
 
-          <TabsContent value="social" className="space-y-4">
+          <TabsContent value="social" className="space-y-4 animate-in">
             <SocialLinksManager socialLinks={socialLinks} />
           </TabsContent>
 
-          <TabsContent value="ai" className="space-y-4">
+          <TabsContent value="ai" className="space-y-4 animate-in">
             <AiInstructionsManager />
           </TabsContent>
         </Tabs>

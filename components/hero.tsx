@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Facebook, Github, Linkedin, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import VerificationBadge from "./verification-badge"
 
 interface HeroProps {
   profile: Profile
@@ -36,16 +37,26 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
         <div className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
       </div>
 
+      {/* شبكة خلفية */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 z-0"></div>
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="w-full md:w-1/2 space-y-8 animate-in">
             <div className="space-y-4">
               <h1 id="hero-heading" className="glass-name text-5xl md:text-7xl font-bold leading-tight">
                 {profile.name}
+                <span className="inline-block mr-2 align-middle">
+                  <VerificationBadge size="lg" />
+                </span>
               </h1>
-              <h2 className="text-2xl md:text-4xl font-semibold text-gray-700 dark:text-gray-300">{profile.title}</h2>
+              <h2 className="text-2xl md:text-4xl font-semibold text-gray-700 dark:text-gray-300 typewriter">
+                {profile.title}
+              </h2>
               {profile.is_available ? (
-                <Badge className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 text-sm">متاح للعمل</Badge>
+                <Badge className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 text-sm pulse-animation">
+                  متاح للعمل
+                </Badge>
               ) : (
                 <Badge variant="outline" className="px-4 py-1 text-sm">
                   غير متاح حاليًا
@@ -53,15 +64,15 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
               )}
             </div>
 
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl leading-relaxed fade-in-animation">
               {profile.bio}
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 button-hover-animation">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="rounded-full text-base px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover-glow"
               >
                 <a href="#contact">تواصل معي</a>
               </Button>
@@ -75,8 +86,8 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
               </Button>
             </div>
 
-            <div className="flex items-center gap-4 pt-4">
-              {socialLinks.map((link) => (
+            <div className="flex items-center gap-4 pt-4 social-icons-animation">
+              {socialLinks.map((link, index) => (
                 <Link
                   key={link.id}
                   href={link.url}
@@ -84,6 +95,7 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
                   rel="noopener noreferrer"
                   aria-label={`زيارة ${link.platform}`}
                   className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-110"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {getSocialIcon(link.platform)}
                 </Link>
@@ -95,7 +107,8 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
             className="w-full md:w-1/2 flex justify-center md:justify-end animate-in"
             style={{ animationDelay: "0.2s" }}
           >
-            <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden gradient-border shadow-2xl">
+            <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden gradient-border shadow-2xl profile-image-animation">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 z-10 mix-blend-overlay"></div>
               <Image
                 src={profile.avatar_url || "/placeholder.svg?height=384&width=384"}
                 alt={profile.name}
@@ -104,6 +117,9 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
                 priority
                 sizes="(max-width: 768px) 288px, 384px"
               />
+              <div className="absolute -bottom-2 -right-2 z-20">
+                <VerificationBadge size="lg" />
+              </div>
             </div>
           </div>
         </div>

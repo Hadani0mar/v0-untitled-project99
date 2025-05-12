@@ -8,9 +8,10 @@ import Link from "next/link"
 
 interface ContactProps {
   socialLinks: SocialLink[]
+  email?: string
 }
 
-export default function Contact({ socialLinks }: ContactProps) {
+export default function Contact({ socialLinks, email = "contact@mousaomar.com" }: ContactProps) {
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "facebook":
@@ -36,22 +37,35 @@ export default function Contact({ socialLinks }: ContactProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="border-none shadow-lg animate-in">
-            <CardContent className="p-6">
+          <Card className="border-none shadow-lg animate-in hover-lift">
+            <CardContent className="p-6 md:p-8">
               <h3 className="text-xl font-semibold mb-6">معلومات التواصل</h3>
 
-              <div className="space-y-4">
-                <div className="flex items-center">
-                  <Mail className="h-5 w-5 ml-3 text-blue-500" />
-                  <span>contact@mousaomar.com</span>
+              <div className="space-y-6">
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <Mail className="h-6 w-6 ml-4 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">البريد الإلكتروني</p>
+                    <a href={`mailto:${email}`} className="font-medium hover:text-blue-500 transition-colors">
+                      {email}
+                    </a>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Phone className="h-5 w-5 ml-3 text-blue-500" />
-                  <span>+1 (234) 567-8901</span>
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <Phone className="h-6 w-6 ml-4 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">رقم الهاتف</p>
+                    <a href="tel:+1234567890" className="font-medium hover:text-blue-500 transition-colors">
+                      +1 (234) 567-8901
+                    </a>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <MapPin className="h-5 w-5 ml-3 text-blue-500" />
-                  <span>نيويورك، الولايات المتحدة</span>
+                <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                  <MapPin className="h-6 w-6 ml-4 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">الموقع</p>
+                    <span className="font-medium">نيويورك، الولايات المتحدة</span>
+                  </div>
                 </div>
               </div>
 
@@ -64,7 +78,7 @@ export default function Contact({ socialLinks }: ContactProps) {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-full bg-white dark:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                      className="p-3 rounded-full bg-white dark:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-110"
                     >
                       {getSocialIcon(link.platform)}
                     </Link>
@@ -74,26 +88,26 @@ export default function Contact({ socialLinks }: ContactProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg animate-in" style={{ animationDelay: "0.2s" }}>
-            <CardContent className="p-6">
+          <Card className="border-none shadow-lg animate-in hover-lift" style={{ animationDelay: "0.2s" }}>
+            <CardContent className="p-6 md:p-8">
               <h3 className="text-xl font-semibold mb-6">أرسل لي رسالة</h3>
 
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Input placeholder="الاسم" />
+              <form className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Input placeholder="الاسم" className="h-12" />
                   </div>
-                  <div>
-                    <Input type="email" placeholder="البريد الإلكتروني" />
+                  <div className="space-y-2">
+                    <Input type="email" placeholder="البريد الإلكتروني" className="h-12" />
                   </div>
                 </div>
-                <div>
-                  <Input placeholder="الموضوع" />
+                <div className="space-y-2">
+                  <Input placeholder="الموضوع" className="h-12" />
                 </div>
-                <div>
-                  <Textarea placeholder="رسالتك" rows={5} />
+                <div className="space-y-2">
+                  <Textarea placeholder="رسالتك" rows={5} className="resize-none" />
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full h-12 text-base">
                   إرسال الرسالة
                 </Button>
               </form>

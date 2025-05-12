@@ -7,11 +7,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Save } from "lucide-react"
+import { Save, RefreshCw } from "lucide-react"
 
 export default function AiInstructionsManager() {
   const [instructions, setInstructions] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
   const [instructionId, setInstructionId] = useState<string | null>(null)
   const { toast } = useToast()
   const router = useRouter()
@@ -71,9 +72,12 @@ export default function AiInstructionsManager() {
         throw result.error
       }
 
+      // تطبيق التعليمات فوراً
+      await applyInstructions()
+
       toast({
         title: "تم الحفظ بنجاح",
-        description: "تم تحديث تعليمات الذكاء الاصطناعي بنجاح",
+        description: "تم تحديث وتطبيق تعليمات الذكاء الاصطناعي بنجاح",
       })
 
       router.refresh()
@@ -86,6 +90,46 @@ export default function AiInstructionsManager() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const applyInstructions = async () => {
+    setIsApplying(true)
+    try {
+      // مسح ذاكرة التخزين المؤقت للتعليمات
+      const response = await fetch("/api/ai/reset-cache", {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        throw new Error("فشل في إعادة تعيين ذاكرة التخزين المؤقت للتعليمات")
+      }
+
+      // مسح المحادثات السابقة وإضافة رسالة ترحيب جديدة
+      localStorage.setItem(
+        "chat_messages",
+        JSON.stringify([
+          {
+            role: "assistant",
+            content: "مرحبًا! تم تحديث تعليماتي. كيف يمكنني مساعدتك اليوم؟",
+            timestamp: Date.now(),
+          },
+        ]),
+      )
+
+      toast({
+        title: "تم تطبيق التعليمات",
+        description: "تم تطبيق التعليمات الجديدة على الذكاء الاصطناعي",
+      })
+    } catch (error) {
+      console.error("خطأ في تطبيق التعليمات:", error)
+      toast({
+        title: "فشل تطبيق التعليمات",
+        description: "فشل تطبيق التعليمات الجديدة. يرجى المحاولة مرة أخرى.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsApplying(false)
     }
   }
 
@@ -110,16 +154,33 @@ export default function AiInstructionsManager() {
               الاستفسارات.
             </p>
           </div>
-          <Button onClick={handleSave} disabled={isLoading} className="w-full">
-            {isLoading ? (
-              "جاري الحفظ..."
-            ) : (
-              <>
-                <Save className="h-4 w-4 ml-2" />
-                حفظ التعليمات
-              </>
-            )}
-          </Button>
+          <div className="flex gap-4">
+            <Button onClick={handleSave} disabled={isLoading} className="flex-1">
+              {isLoading ? (
+                "جاري الحفظ..."
+              ) : (
+                <>
+                  <Save className="h-4 w-4 ml-2" />
+                  حفظ وتطبيق التعليمات
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={applyInstructions}
+              disabled={isApplying || isLoading}
+              className="flex items-center gap-2"
+            >
+              {isApplying ? (
+                "جاري التطبيق..."
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  تطبيق فقط
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

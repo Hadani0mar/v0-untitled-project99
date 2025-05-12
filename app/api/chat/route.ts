@@ -2,20 +2,43 @@ import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
 import { groq } from "@ai-sdk/groq"
 import { createServerClient } from "@/lib/supabase/server"
+import { lastInstructionsUpdate } from "../ai/reset-cache/route"
+
+// ذاكرة تخزين مؤقت للتعليمات
+let cachedInstructions: string | null = null
+let cacheTimestamp = 0
 
 export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json()
     const supabase = createServerClient()
 
-    // جلب تعليمات الذكاء الاصطناعي
-    const { data: aiData, error: aiError } = await supabase.from("ai_instructions").select("instructions").single()
+    // التحقق مما إذا كانت التعليمات المخزنة مؤقتًا صالحة
+    const shouldRefreshCache = !cachedInstructions || cacheTimestamp < lastInstructionsUpdate
 
+    // جلب تعليمات الذكاء الاصطناعي
     let systemPrompt =
       "أنت مساعد ذكي يدعى Mousa AI. أنت تمثل موسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية."
 
-    if (!aiError && aiData) {
-      systemPrompt = aiData.instructions
+    if (shouldRefreshCache) {
+      try {
+        const { data: aiData, error: aiError } = await supabase.from("ai_instructions").select("instructions").single()
+
+        if (!aiError && aiData) {
+          systemPrompt = aiData.instructions
+          cachedInstructions = systemPrompt
+          cacheTimestamp = Date.now()
+        }
+      } catch (error) {
+        console.error("خطأ في جلب تعليمات الذكاء الاصطناعي:", error)
+        // استخدام التعليمات المخزنة مؤقتًا إذا كانت متاحة
+        if (cachedInstructions) {
+          systemPrompt = cachedInstructions
+        }
+      }
+    } else {
+      // استخدام التعليمات المخزنة مؤقتًا
+      systemPrompt = cachedInstructions
     }
 
     // تحقق من وجود مفتاح API لـ Groq
