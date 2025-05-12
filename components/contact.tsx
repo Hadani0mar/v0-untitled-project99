@@ -11,7 +11,7 @@ interface ContactProps {
   email?: string
 }
 
-export default function Contact({ socialLinks, email = "contact@mousaomar.com" }: ContactProps) {
+export default function Contact({ socialLinks, email = "mousa.omar.com@gmail.com" }: ContactProps) {
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "facebook":
@@ -55,8 +55,8 @@ export default function Contact({ socialLinks, email = "contact@mousaomar.com" }
                   <Phone className="h-6 w-6 ml-4 text-blue-500" />
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">رقم الهاتف</p>
-                    <a href="tel:+1234567890" className="font-medium hover:text-blue-500 transition-colors">
-                      +1 (234) 567-8901
+                    <a href="tel:+218931303032" className="font-medium hover:text-blue-500 transition-colors">
+                      +218 93 130 3032
                     </a>
                   </div>
                 </div>
@@ -64,7 +64,7 @@ export default function Contact({ socialLinks, email = "contact@mousaomar.com" }
                   <MapPin className="h-6 w-6 ml-4 text-blue-500" />
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">الموقع</p>
-                    <span className="font-medium">نيويورك، الولايات المتحدة</span>
+                    <span className="font-medium">سبها، ليبيا</span>
                   </div>
                 </div>
               </div>
@@ -78,6 +78,7 @@ export default function Contact({ socialLinks, email = "contact@mousaomar.com" }
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`زيارة ${link.platform}`}
                       className="p-3 rounded-full bg-white dark:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-110"
                     >
                       {getSocialIcon(link.platform)}

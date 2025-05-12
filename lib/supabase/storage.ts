@@ -1,66 +1,33 @@
-import { supabase } from "./client"
-
-// إنشاء الدلائل المطلوبة في Supabase Storage
-export async function createStorageBuckets() {
-  try {
-    console.log("بدء تهيئة دلائل التخزين...")
-
-    // إنشاء دلو للصور الشخصية
-    const { error: profileError } = await supabase.storage.createBucket("profile-images", {
-      public: true,
-    })
-
-    if (profileError && !profileError.message.includes("already exists")) {
-      console.error("خطأ في إنشاء دلو الصور الشخصية:", profileError)
-    } else {
-      console.log("تم التحقق من وجود دلو الصور الشخصية")
-    }
-
-    // إنشاء دلو لصور المشاريع
-    const { error: projectError } = await supabase.storage.createBucket("project-images", {
-      public: true,
-    })
-
-    if (projectError && !projectError.message.includes("already exists")) {
-      console.error("خطأ في إنشاء دلو صور المشاريع:", projectError)
-    } else {
-      console.log("تم التحقق من وجود دلو صور المشاريع")
-    }
-
-    // التحقق من قائمة الدلائل المتاحة
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets()
-
-    if (listError) {
-      console.error("خطأ في قائمة الدلائل:", listError)
-    } else {
-      console.log(
-        "الدلائل المتاحة:",
-        buckets.map((b) => b.name),
-      )
-    }
-
-    return { success: true, buckets }
-  } catch (error) {
-    console.error("خطأ في إنشاء دلائل التخزين:", error)
-    return { success: false, error }
-  }
-}
-
+// Function to ensure a bucket exists by calling the server API
 export async function ensureBucketExists(bucketName: string): Promise<{ success: boolean; error?: any }> {
   try {
-    const { error } = await supabase.storage.createBucket(bucketName, {
-      public: true,
+    console.log(`التحقق من وجود الدلو: ${bucketName} عبر واجهة برمجة التطبيقات`)
+
+    // Call the server API to initialize storage
+    const response = await fetch("/api/storage/init", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
 
-    if (error && !error.message.includes("already exists")) {
-      console.error(`Error creating bucket ${bucketName}:`, error)
-      return { success: false, error }
-    } else {
-      console.log(`Bucket ${bucketName} exists or was successfully created.`)
+    const data = await response.json()
+
+    if (!response.ok) {
+      console.error(`خطأ في تهيئة التخزين:`, data.error)
+      return { success: false, error: data.error }
+    }
+
+    // Check if our bucket is in the list of available buckets
+    if (data.buckets && data.buckets.includes(bucketName)) {
+      console.log(`الدلو ${bucketName} موجود ومتاح.`)
       return { success: true }
+    } else {
+      console.error(`الدلو ${bucketName} غير موجود في القائمة المتاحة.`)
+      return { success: false, error: `الدلو ${bucketName} غير موجود` }
     }
   } catch (error) {
-    console.error(`Error ensuring bucket ${bucketName} exists:`, error)
+    console.error(`استثناء أثناء التحقق من وجود الدلو ${bucketName}:`, error)
     return { success: false, error }
   }
 }

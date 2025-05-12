@@ -1,18 +1,38 @@
 import { NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase/server"
+import { createClient } from "@supabase/supabase-js"
+import { cookies } from "next/headers"
 
 export async function POST() {
   try {
-    const supabase = createServerClient()
+    // التحقق من أن المستخدم مسجل الدخول كمدير
+    const cookieStore = cookies()
+    const adminCookie = cookieStore.get("admin_authenticated")
+
+    if (adminCookie?.value !== "true") {
+      return NextResponse.json({ success: false, error: "غير مصرح" }, { status: 401 })
+    }
+
+    // Create a Supabase client with the service role key to bypass RLS
+    const supabaseAdmin = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+
+    console.log("بدء تهيئة التخزين من واجهة برمجة التطبيقات باستخدام مفتاح الخدمة...")
 
     // إنشاء دلو للصور الشخصية
     try {
-      const { data: profileBucket, error: profileError } = await supabase.storage.createBucket("profile-images", {
+      console.log("محاولة إنشاء دلو الصور الشخصية...")
+      const { data: profileBucket, error: profileError } = await supabaseAdmin.storage.createBucket("profile-images", {
         public: true,
       })
 
       if (profileError && !profileError.message.includes("already exists")) {
         console.error("خطأ في إنشاء دلو الصور الشخصية:", profileError)
+      } else {
+        console.log("تم إنشاء أو التحقق من وجود دلو الصور الشخصية")
       }
     } catch (error) {
       console.error("استثناء عند إنشاء دلو الصور الشخصية:", error)
@@ -20,23 +40,32 @@ export async function POST() {
 
     // إنشاء دلو لصور المشاريع
     try {
-      const { data: projectBucket, error: projectError } = await supabase.storage.createBucket("project-images", {
+      console.log("محاولة إنشاء دلو صور المشاريع...")
+      const { data: projectBucket, error: projectError } = await supabaseAdmin.storage.createBucket("project-images", {
         public: true,
       })
 
       if (projectError && !projectError.message.includes("already exists")) {
         console.error("خطأ في إنشاء دلو صور المشاريع:", projectError)
+      } else {
+        console.log("تم إنشاء أو التحقق من وجود دلو صور المشاريع")
       }
     } catch (error) {
       console.error("استثناء عند إنشاء دلو صور المشاريع:", error)
     }
 
     // التحقق من قائمة الدلائل المتاحة
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets()
+    const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets()
 
     if (listError) {
+      console.error("خطأ في قائمة الدلائل:", listError)
       return NextResponse.json({ success: false, error: listError.message }, { status: 500 })
     }
+
+    console.log(
+      "تم تهيئة التخزين بنجاح. الدلائل المتاحة:",
+      buckets.map((b) => b.name),
+    )
 
     return NextResponse.json({
       success: true,

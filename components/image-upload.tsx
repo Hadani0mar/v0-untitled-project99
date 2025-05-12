@@ -2,9 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { supabase } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 import { Upload, Loader2 } from "lucide-react"
 import Image from "next/image"
@@ -25,6 +24,13 @@ export default function ImageUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)
   const { toast } = useToast()
+
+  useEffect(() => {
+    // تحديث معاينة الصورة عند تغيير currentImageUrl
+    if (currentImageUrl) {
+      setPreviewUrl(currentImageUrl)
+    }
+  }, [currentImageUrl])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -57,37 +63,28 @@ export default function ImageUpload({
       const localPreview = URL.createObjectURL(file)
       setPreviewUrl(localPreview)
 
-      // إنشاء اسم ملف فريد
-      const fileExt = file.name.split(".").pop()
-      const fileName = `${Date.now()}.${fileExt}`
-      const filePath = folderPath ? `${folderPath}/${fileName}` : fileName
+      // إنشاء FormData لتحميل الملف
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("bucketName", bucketName)
+      formData.append("folderPath", folderPath)
 
-      console.log(`محاولة تحميل الملف إلى ${bucketName}/${filePath}`)
-
-      // التحميل إلى Supabase Storage
-      const { data, error } = await supabase.storage.from(bucketName).upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: true,
+      // استخدام واجهة برمجة التطبيقات الخاصة بنا للتحميل
+      const response = await fetch("/api/storage/upload", {
+        method: "POST",
+        body: formData,
       })
 
-      if (error) {
-        console.error("خطأ في تحميل الملف:", error)
-        throw error
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || "فشل في تحميل الملف")
       }
 
-      console.log("تم تحميل الملف بنجاح:", data)
-
-      // الحصول على عنوان URL العام
-      const { data: publicUrlData } = supabase.storage.from(bucketName).getPublicUrl(filePath)
-
-      console.log("عنوان URL العام:", publicUrlData.publicUrl)
-
-      if (!publicUrlData.publicUrl) {
-        throw new Error("فشل في الحصول على عنوان URL العام للملف المحمل")
-      }
+      console.log("تم تحميل الملف بنجاح:", result)
 
       // استدعاء الدالة المرجعية مع عنوان URL الجديد
-      onUploadComplete(publicUrlData.publicUrl)
+      onUploadComplete(result.publicUrl)
 
       toast({
         title: "تم التحميل بنجاح",
