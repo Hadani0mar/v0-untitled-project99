@@ -54,7 +54,10 @@ export default function FixedHeader({ profile }: FixedHeaderProps) {
               />
             </div>
             <div className="absolute -bottom-1 -right-1">
-              <VerificationBadge size="sm" />
+              <VerificationBadge
+                size="sm"
+                style={profile.verification_badge_style as "facebook" | "twitter" | undefined}
+              />
             </div>
           </div>
           <div className={`transition-opacity duration-300 ${scrolled ? "opacity-100" : "opacity-0"}`}>

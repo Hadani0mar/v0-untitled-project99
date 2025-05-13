@@ -15,6 +15,8 @@ import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import ImageUpload from "@/components/image-upload"
 import { Save, Mail } from "lucide-react"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import VerificationBadge from "@/components/verification-badge"
 
 interface ProfileFormProps {
   profile: Profile
@@ -27,6 +29,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
     bio: profile.bio,
     avatar_url: profile.avatar_url,
     is_available: profile.is_available,
+    verification_badge_style: profile.verification_badge_style || "facebook",
   })
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
@@ -43,6 +46,10 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
 
   const handleImageUpload = (url: string) => {
     setFormData((prev) => ({ ...prev, avatar_url: url }))
+  }
+
+  const handleBadgeStyleChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, verification_badge_style: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -153,6 +160,30 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
               />
             </div>
             <p className="text-sm text-gray-500">هذا البريد الإلكتروني سيظهر في قسم التواصل</p>
+          </div>
+
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <Label className="text-base font-medium">نمط علامة التوثيق</Label>
+            <RadioGroup
+              value={formData.verification_badge_style}
+              onValueChange={handleBadgeStyleChange}
+              className="flex flex-col space-y-3"
+            >
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <RadioGroupItem value="facebook" id="badge-facebook" />
+                <Label htmlFor="badge-facebook" className="flex items-center gap-2">
+                  <span>علامة توثيق فيسبوك</span>
+                  <VerificationBadge style="facebook" />
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <RadioGroupItem value="twitter" id="badge-twitter" />
+                <Label htmlFor="badge-twitter" className="flex items-center gap-2">
+                  <span>علامة توثيق تويتر الذهبية</span>
+                  <VerificationBadge style="twitter" />
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
           <div className="flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">

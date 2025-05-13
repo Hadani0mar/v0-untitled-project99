@@ -47,7 +47,10 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
               <h1 id="hero-heading" className="glass-name text-5xl md:text-7xl font-bold leading-tight">
                 {profile.name}
                 <span className="inline-block mr-2 align-middle">
-                  <VerificationBadge size="lg" />
+                  <VerificationBadge
+                    size="lg"
+                    style={profile.verification_badge_style as "facebook" | "twitter" | undefined}
+                  />
                 </span>
               </h1>
               <h2 className="text-2xl md:text-4xl font-semibold text-gray-700 dark:text-gray-300 typewriter">
@@ -118,7 +121,10 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
                 sizes="(max-width: 768px) 288px, 384px"
               />
               <div className="absolute -bottom-2 -right-2 z-20">
-                <VerificationBadge size="lg" />
+                <VerificationBadge
+                  size="lg"
+                  style={profile.verification_badge_style as "facebook" | "twitter" | undefined}
+                />
               </div>
             </div>
           </div>

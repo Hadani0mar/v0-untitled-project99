@@ -5,6 +5,7 @@ export interface Profile {
   bio: string
   avatar_url: string
   is_available: boolean
+  verification_badge_style?: string
   created_at: string
   updated_at: string
 }
