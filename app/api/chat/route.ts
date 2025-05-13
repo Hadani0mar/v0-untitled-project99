@@ -10,7 +10,7 @@ let cacheTimestamp = 0
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const { messages, instructions } = await req.json()
     const supabase = createServerClient()
 
     // التحقق مما إذا كانت التعليمات المخزنة مؤقتًا صالحة
@@ -20,7 +20,12 @@ export async function POST(req: NextRequest) {
     let systemPrompt =
       "أنت مساعد ذكي يدعى Mousa AI. أنت تمثل موسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية."
 
-    if (shouldRefreshCache) {
+    // استخدام التعليمات المخصصة إذا تم توفيرها
+    if (instructions) {
+      systemPrompt = instructions
+      cachedInstructions = instructions
+      cacheTimestamp = Date.now()
+    } else if (shouldRefreshCache) {
       try {
         const { data: aiData, error: aiError } = await supabase.from("ai_instructions").select("instructions").single()
 

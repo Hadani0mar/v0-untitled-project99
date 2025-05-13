@@ -3,7 +3,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, Github } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
 
 interface ProjectsProps {
   projects: Project[]
@@ -56,16 +55,16 @@ export default function Projects({ projects }: ProjectsProps) {
               </CardContent>
               <CardFooter className="px-6 pb-6 pt-0 flex justify-between">
                 <Button asChild variant="outline" size="sm">
-                  <Link href={project.project_url} target="_blank" rel="noopener noreferrer">
+                  <a href={project.project_url} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 ml-2" />
                     عرض المشروع
-                  </Link>
+                  </a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link href={project.github_url} target="_blank" rel="noopener noreferrer">
+                  <a href={project.github_url} target="_blank" rel="noopener noreferrer">
                     <Github className="h-4 w-4 ml-2" />
                     الكود
-                  </Link>
+                  </a>
                 </Button>
               </CardFooter>
             </Card>

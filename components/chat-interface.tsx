@@ -30,6 +30,7 @@ export default function ChatInterface() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [aiInstructions, setAiInstructions] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -69,6 +70,8 @@ export default function ChatInterface() {
         const data = await response.json()
 
         if (response.ok) {
+          setAiInstructions(data.instructions)
+
           // إذا لم تكن هناك رسائل محفوظة، أضف رسالة ترحيب
           if (messages.length === 0) {
             setMessages([
@@ -120,6 +123,7 @@ export default function ChatInterface() {
             role: msg.role,
             content: msg.content,
           })),
+          instructions: aiInstructions, // إرسال التعليمات المخصصة إلى واجهة برمجة التطبيقات
         }),
       })
 

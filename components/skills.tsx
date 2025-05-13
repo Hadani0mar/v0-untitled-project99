@@ -65,10 +65,14 @@ export default function Skills({ skills }: SkillsProps) {
                 {categorySkills.map((skill, skillIndex) => (
                   <ParallaxEffect key={skill.id} speed={0.02} className="h-full">
                     <div
-                      className="glass-card p-4 rounded-lg fade-in-section card-3d h-full"
+                      className="glass-card p-4 rounded-lg fade-in-section card-3d h-full relative overflow-hidden"
                       style={{ animationDelay: `${0.1 * (categoryIndex + skillIndex + 1)}s` }}
                     >
-                      <div className="text-center">
+                      {/* بقع الألوان الداخلية */}
+                      <div className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-blue-300/30 dark:bg-white/10 blur-xl"></div>
+                      <div className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-purple-300/30 dark:bg-white/10 blur-xl"></div>
+
+                      <div className="text-center relative z-10">
                         <h4 className="font-medium mb-2">{skill.name}</h4>
                         <div className="skill-bar">
                           <div

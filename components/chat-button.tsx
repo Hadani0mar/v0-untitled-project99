@@ -27,19 +27,21 @@ export default function ChatButton() {
 
   return (
     <>
-      <Button
-        onClick={() => {
-          setIsOpen(true)
-          setHasUnreadMessages(false)
-        }}
-        className="fixed bottom-6 left-6 rounded-full h-14 w-14 p-0 shadow-lg"
-        aria-label="فتح المحادثة"
-      >
-        <MessageCircle className="h-6 w-6" />
-        {hasUnreadMessages && (
-          <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full animate-pulse"></span>
-        )}
-      </Button>
+      {!isOpen && (
+        <Button
+          onClick={() => {
+            setIsOpen(true)
+            setHasUnreadMessages(false)
+          }}
+          className="fixed bottom-6 left-6 rounded-full h-14 w-14 p-0 shadow-lg z-40"
+          aria-label="فتح المحادثة"
+        >
+          <MessageCircle className="h-6 w-6" />
+          {hasUnreadMessages && (
+            <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full animate-pulse"></span>
+          )}
+        </Button>
+      )}
 
       {isOpen && (
         <div className="fixed bottom-6 left-6 z-50 w-80 md:w-96 h-[500px] animate-in">
@@ -51,6 +53,7 @@ export default function ChatButton() {
                 size="icon"
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:bg-white/20"
+                aria-label="إغلاق المحادثة"
               >
                 <X className="h-5 w-5" />
               </Button>

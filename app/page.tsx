@@ -9,6 +9,7 @@ import ScrollToTop from "@/components/scroll-to-top"
 import WelcomeMessage from "@/components/welcome-message"
 import JsonLd from "@/components/json-ld"
 import FixedHeader from "@/components/fixed-header"
+import ColorBlobs from "@/components/color-blobs"
 import type { Profile, Skill, Project, SocialLink } from "@/lib/types"
 import type { Metadata } from "next"
 
@@ -46,6 +47,7 @@ export default async function Home() {
   return (
     <>
       <JsonLd profile={profile} skills={skills} projects={projects} socialLinks={socialLinks} />
+      <ColorBlobs />
       <FixedHeader profile={profile} />
       <ScrollToTop />
       <WelcomeMessage />
@@ -54,7 +56,12 @@ export default async function Home() {
         <About profile={profile} />
         <Skills skills={skills} />
         <Projects projects={projects} />
-        <Contact socialLinks={socialLinks} email="mousa.omar.com@gmail.com" />
+        <Contact
+          socialLinks={socialLinks}
+          email="mousa.omar.com@gmail.com"
+          phone="+218931303032"
+          address="سبها، ليبيا"
+        />
         <ChatButton />
       </main>
     </>

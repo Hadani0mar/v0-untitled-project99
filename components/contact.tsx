@@ -9,9 +9,16 @@ import Link from "next/link"
 interface ContactProps {
   socialLinks: SocialLink[]
   email?: string
+  phone?: string
+  address?: string
 }
 
-export default function Contact({ socialLinks, email = "mousa.omar.com@gmail.com" }: ContactProps) {
+export default function Contact({
+  socialLinks,
+  email = "mousa.omar.com@gmail.com",
+  phone = "+218931303032",
+  address = "سبها، ليبيا",
+}: ContactProps) {
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case "facebook":
@@ -55,8 +62,8 @@ export default function Contact({ socialLinks, email = "mousa.omar.com@gmail.com
                   <Phone className="h-6 w-6 ml-4 text-blue-500" />
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">رقم الهاتف</p>
-                    <a href="tel:+218931303032" className="font-medium hover:text-blue-500 transition-colors">
-                      +218 93 130 3032
+                    <a href={`tel:${phone}`} className="font-medium hover:text-blue-500 transition-colors">
+                      {phone}
                     </a>
                   </div>
                 </div>
@@ -64,7 +71,7 @@ export default function Contact({ socialLinks, email = "mousa.omar.com@gmail.com
                   <MapPin className="h-6 w-6 ml-4 text-blue-500" />
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">الموقع</p>
-                    <span className="font-medium">سبها، ليبيا</span>
+                    <span className="font-medium">{address}</span>
                   </div>
                 </div>
               </div>
