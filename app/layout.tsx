@@ -1,3 +1,12 @@
+import type React from "react"
+import type { Metadata } from "next"
+import { Cairo } from "next/font/google"
+import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
+
+const cairo = Cairo({ subsets: ["arabic"] })
+
 export const metadata: Metadata = {
   title: "موسى عمر | مطور واجهات أمامية محترف",
   description: "الملف الشخصي المهني لموسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية",
@@ -10,14 +19,6 @@ export const metadata: Metadata = {
     "TypeScript",
     "موسى عمر",
     "تصميم مواقع",
-    "مطور واجهات أمامية في ليبيا",
-    "مطور واجهات في سبها",
-    "تصميم مواقع احترافية",
-    "مطور Next.js محترف",
-    "برمجة صفحات ويب تفاعلية",
-    "مطور React في ليبيا",
-    "بناء مواقع متجاوبة",
-    "مطور Frontend عربي"
   ],
   authors: [{ name: "موسى عمر" }],
   creator: "موسى عمر",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ar_AR",
-    url: "https://mousa.org.ly",
+    url: "https://mousaomar.com",
     title: "موسى عمر | مطور واجهات أمامية محترف",
     description: "الملف الشخصي المهني لموسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية",
     siteName: "موسى عمر",
@@ -59,7 +60,31 @@ export const metadata: Metadata = {
     google: "verification_token",
   },
   alternates: {
-    canonical: "https://mousa.org.ly",
+    canonical: "https://mousaomar.com",
   },
-  generator: 'v0.dev'
+    generator: 'v0.dev'
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <meta name="theme-color" content="#3b82f6" />
+        {/* إضافة مكتبة Bootstrap Icons */}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+      </head>
+      <body className={cairo.className}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
+  )
 }
