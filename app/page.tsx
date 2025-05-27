@@ -11,7 +11,6 @@ import WelcomeMessage from "@/components/welcome-message"
 import JsonLd from "@/components/json-ld"
 import FixedHeader from "@/components/fixed-header"
 import ColorBlobs from "@/components/color-blobs"
-import AnalyticsTracker from "@/components/analytics-tracker"
 import type { Profile, Skill, Project, SocialLink, BlogPost, BlogCategory } from "@/lib/types"
 import type { Metadata } from "next"
 
@@ -41,34 +40,6 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function getAnalyticsData(supabase: any) {
-  try {
-    // جلب إجمالي مشاهدات المدونة مباشرة من Supabase
-    const { data: blogStats, error: blogError } = await supabase.from("visitor_stats").select("blog_views")
-
-    if (blogError) {
-      console.warn("لم يتم العثور على إحصائيات المدونة، سيتم إنشاء بيانات افتراضية:", blogError.message)
-
-      // إنشاء سجل افتراضي لليوم الحالي
-      const today = new Date().toISOString().split("T")[0]
-      await supabase.from("visitor_stats").upsert({
-        date: today,
-        page_views: 0,
-        unique_visitors: 0,
-        blog_views: 0,
-      })
-
-      return 0
-    }
-
-    const totalBlogViews = blogStats?.reduce((sum: number, stat: any) => sum + (stat.blog_views || 0), 0) || 0
-    return totalBlogViews
-  } catch (error) {
-    console.warn("خطأ في جلب إحصائيات المدونة، سيتم استخدام قيمة افتراضية:", error)
-    return 0
-  }
-}
-
 export default async function Home() {
   try {
     const supabase = createServerClient()
@@ -84,8 +55,8 @@ export default async function Home() {
     ] = await Promise.all([
       supabase.from("profiles").select("*").single(),
       supabase.from("skills").select("*").order("category"),
-      supabase.from("projects").select("*").order("created_at", { ascending: false }),
-      supabase.from("social_links").select("*").order("created_at"),
+      supabase.from("projects").select("*"),
+      supabase.from("social_links").select("*"),
       supabase
         .from("blog_posts")
         .select(`
@@ -105,8 +76,19 @@ export default async function Home() {
     if (blogError) console.error("خطأ في جلب مقالات المدونة:", blogError)
     if (categoriesError) console.error("خطأ في جلب تصنيفات المدونة:", categoriesError)
 
-    // Get analytics data directly from Supabase
-    const totalBlogViews = await getAnalyticsData(supabase)
+    // Get analytics data
+    let totalBlogViews = 0
+    try {
+      const analyticsResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/analytics/stats`,
+      )
+      if (analyticsResponse.ok) {
+        const analyticsData = await analyticsResponse.json()
+        totalBlogViews = analyticsData.totalBlogViews
+      }
+    } catch (error) {
+      console.error("خطأ في جلب إحصائيات المدونة:", error)
+    }
 
     // Use default values if data is missing
     const profile = (profileData as Profile) || {
@@ -130,7 +112,6 @@ export default async function Home() {
     return (
       <>
         <JsonLd profile={profile} skills={skills} projects={projects} socialLinks={socialLinks} />
-        <AnalyticsTracker />
         <ColorBlobs />
         <FixedHeader profile={profile} />
         <ScrollToTop />

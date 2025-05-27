@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { Edit, Plus, Trash, Eye, EyeOff, Clock } from "lucide-react"
+import { Edit, Plus, Trash, Eye, EyeOff } from "lucide-react"
 import Image from "next/image"
 import ImageUpload from "@/components/image-upload"
 import {
@@ -36,7 +36,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface BlogManagerProps {
   posts: BlogPost[]
@@ -51,8 +50,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
     excerpt: "",
     featured_image_url: "",
     published: false,
-    category_id: "default", // Updated default value to be a non-empty string
-    reading_time: 5,
   })
 
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
@@ -67,6 +64,7 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
   useEffect(() => {
     const checkBucket = async () => {
       try {
+        // محاولة تهيئة التخزين أولاً
         const initResponse = await fetch("/api/storage/init", {
           method: "POST",
           headers: {
@@ -78,6 +76,7 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
           const initData = await initResponse.json()
           console.log("تم تهيئة التخزين بنجاح:", initData.buckets)
 
+          // التحقق من وجود دلو صور المدونة
           if (initData.buckets && initData.buckets.includes("blog-images")) {
             setBucketReady(true)
           } else {
@@ -105,18 +104,10 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
       .trim()
   }
 
-  const calculateReadingTime = (content: string) => {
-    const wordsPerMinute = 200
-    const words = content.split(/\s+/).length
-    return Math.ceil(words / wordsPerMinute)
-  }
-
   const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     if (name === "title") {
       setNewPost((prev) => ({ ...prev, [name]: value, slug: generateSlug(value) }))
-    } else if (name === "content") {
-      setNewPost((prev) => ({ ...prev, [name]: value, reading_time: calculateReadingTime(value) }))
     } else {
       setNewPost((prev) => ({ ...prev, [name]: value }))
     }
@@ -127,8 +118,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
     const { name, value } = e.target
     if (name === "title") {
       setEditingPost((prev) => ({ ...prev!, [name]: value, slug: generateSlug(value) }))
-    } else if (name === "content") {
-      setEditingPost((prev) => ({ ...prev!, [name]: value, reading_time: calculateReadingTime(value) }))
     } else {
       setEditingPost((prev) => ({ ...prev!, [name]: value }))
     }
@@ -147,7 +136,9 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
     setIsLoading(true)
 
     try {
+      // التأكد من وجود دلو صور المدونة قبل الإضافة
       if (!isBucketReady) {
+        // محاولة تهيئة التخزين مرة أخرى
         const initResponse = await fetch("/api/storage/init", {
           method: "POST",
           headers: {
@@ -176,9 +167,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
           excerpt: newPost.excerpt,
           featured_image_url: newPost.featured_image_url,
           published: newPost.published,
-          category_id: newPost.category_id || null,
-          reading_time: newPost.reading_time,
-          views: 0,
         })
         .select()
 
@@ -189,6 +177,7 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
         description: `تمت إضافة ${newPost.title} بنجاح`,
       })
 
+      // إعادة تعيين النموذج
       setNewPost({
         title: "",
         slug: "",
@@ -196,8 +185,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
         excerpt: "",
         featured_image_url: "",
         published: false,
-        category_id: "default", // Updated default value to be a non-empty string
-        reading_time: 5,
       })
 
       setIsDialogOpen(false)
@@ -219,7 +206,9 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
     setIsLoading(true)
 
     try {
+      // التأكد من وجود دلو صور المدونة قبل التحديث
       if (!isBucketReady) {
+        // محاولة تهيئة التخزين مرة أخرى
         const initResponse = await fetch("/api/storage/init", {
           method: "POST",
           headers: {
@@ -248,8 +237,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
           excerpt: editingPost.excerpt,
           featured_image_url: editingPost.featured_image_url,
           published: editingPost.published,
-          category_id: editingPost.category_id || null,
-          reading_time: editingPost.reading_time,
           updated_at: new Date().toISOString(),
         })
         .eq("id", editingPost.id)
@@ -323,16 +310,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
     }
   }
 
-  const getCategoryName = (categoryId: string) => {
-    const category = categories.find((cat) => cat.id === categoryId)
-    return category ? category.name : "بدون تصنيف"
-  }
-
-  const getCategoryColor = (categoryId: string) => {
-    const category = categories.find((cat) => cat.id === categoryId)
-    return category ? category.color : "#6b7280"
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -374,50 +351,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                   />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category">التصنيف</Label>
-                  <Select
-                    value={newPost.category_id}
-                    onValueChange={(value) => setNewPost((prev) => ({ ...prev, category_id: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر تصنيف" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default">بدون تصنيف</SelectItem> {/* Updated value to be a non-empty string */}
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-3 h-3 rounded-full"
-                              style={{ backgroundColor: category.color || "#6b7280" }}
-                            />
-                            {category.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="reading_time" className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    وقت القراءة (دقائق)
-                  </Label>
-                  <Input
-                    id="reading_time"
-                    name="reading_time"
-                    type="number"
-                    value={newPost.reading_time}
-                    onChange={handleNewPostChange}
-                    min="1"
-                    max="60"
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="excerpt">المقتطف</Label>
                 <Textarea
@@ -429,7 +362,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                   rows={3}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label>الصورة المميزة</Label>
                 <ImageUpload
@@ -439,7 +371,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                   folderPath="featured"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="content">محتوى المقال</Label>
                 <Textarea
@@ -447,15 +378,11 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                   name="content"
                   value={newPost.content}
                   onChange={handleNewPostChange}
-                  placeholder="اكتب محتوى المقال هنا..."
+                  placeholder="اكتب محتوى المقال هنا... يمكنك استخدام Markdown"
                   rows={10}
                   required
                 />
-                <p className="text-sm text-gray-500">
-                  وقت القراءة المقدر: {calculateReadingTime(newPost.content)} دقائق
-                </p>
               </div>
-
               <div className="flex items-center space-x-2">
                 <Switch
                   id="published"
@@ -496,17 +423,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                     <div>
                       <h3 className="text-lg font-semibold">{post.title}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">/{post.slug}</p>
-                      {post.category_id && (
-                        <div className="flex items-center gap-2 mt-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: getCategoryColor(post.category_id) }}
-                          />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {getCategoryName(post.category_id)}
-                          </span>
-                        </div>
-                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -552,53 +468,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                                   />
                                 </div>
                               </div>
-
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                  <Label htmlFor="edit-category">التصنيف</Label>
-                                  <Select
-                                    value={editingPost.category_id || "default"} // Updated value to be a non-empty string
-                                    onValueChange={(value) =>
-                                      setEditingPost((prev) => ({ ...prev!, category_id: value }))
-                                    }
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="اختر تصنيف" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="default">بدون تصنيف</SelectItem>{" "}
-                                      {/* Updated value to be a non-empty string */}
-                                      {categories.map((category) => (
-                                        <SelectItem key={category.id} value={category.id}>
-                                          <div className="flex items-center gap-2">
-                                            <div
-                                              className="w-3 h-3 rounded-full"
-                                              style={{ backgroundColor: category.color || "#6b7280" }}
-                                            />
-                                            {category.name}
-                                          </div>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="edit-reading_time" className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4" />
-                                    وقت القراءة (دقائق)
-                                  </Label>
-                                  <Input
-                                    id="edit-reading_time"
-                                    name="reading_time"
-                                    type="number"
-                                    value={editingPost.reading_time}
-                                    onChange={handleEditPostChange}
-                                    min="1"
-                                    max="60"
-                                  />
-                                </div>
-                              </div>
-
                               <div className="space-y-2">
                                 <Label htmlFor="edit-excerpt">المقتطف</Label>
                                 <Textarea
@@ -609,7 +478,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                                   rows={3}
                                 />
                               </div>
-
                               <div className="space-y-2">
                                 <Label>الصورة المميزة</Label>
                                 <ImageUpload
@@ -619,7 +487,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                                   folderPath="featured"
                                 />
                               </div>
-
                               <div className="space-y-2">
                                 <Label htmlFor="edit-content">محتوى المقال</Label>
                                 <Textarea
@@ -630,11 +497,7 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                                   rows={10}
                                   required
                                 />
-                                <p className="text-sm text-gray-500">
-                                  وقت القراءة المقدر: {calculateReadingTime(editingPost.content)} دقائق
-                                </p>
                               </div>
-
                               <div className="flex items-center space-x-2">
                                 <Switch
                                   id="edit-published"
@@ -686,18 +549,6 @@ export default function BlogManager({ posts, categories }: BlogManagerProps) {
                   {post.excerpt && <p className="text-gray-600 dark:text-gray-400 line-clamp-2">{post.excerpt}</p>}
                   <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span>{new Date(post.created_at).toLocaleDateString("ar-SA")}</span>
-                    {post.reading_time && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{post.reading_time} دقائق قراءة</span>
-                      </div>
-                    )}
-                    {post.views !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        <span>{post.views} مشاهدة</span>
-                      </div>
-                    )}
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
                         post.published
