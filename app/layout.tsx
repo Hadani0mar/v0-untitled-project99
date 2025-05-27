@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ar_AR",
-    url: "https://mousaomar.com",
+    url: "https://mousa.org.ly",
     title: "موسى عمر | مطور واجهات أمامية محترف",
     description: "الملف الشخصي المهني لموسى عمر، مطور واجهات أمامية متخصص في بناء تطبيقات ويب حديثة وتفاعلية",
     siteName: "موسى عمر",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     google: "verification_token",
   },
   alternates: {
-    canonical: "https://mousaomar.com",
+    canonical: "https://mousa.org.ly",
   },
     generator: 'v0.dev'
 }
