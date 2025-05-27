@@ -44,7 +44,7 @@ export default function Hero({ profile, socialLinks }: HeroProps) {
         <div className="flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="w-full md:w-1/2 space-y-8 animate-in">
             <div className="space-y-4">
-              <h1 id="hero-heading" className="glass-name text-5xl md:text-7xl font-bold leading-tight">
+              <h1 id="hero-heading" className="text-5xl md:text-7xl font-bold leading-tight gradient-text">
                 {profile.name}
                 <span className="inline-block mr-2 align-middle">
                   <VerificationBadge

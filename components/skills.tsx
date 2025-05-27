@@ -52,28 +52,28 @@ export default function Skills({ skills }: SkillsProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
           {Object.entries(groupedSkills).map(([category, categorySkills], categoryIndex) => (
             <div key={category} className="fade-in-section" style={{ animationDelay: `${0.1 * categoryIndex}s` }}>
-              <h3 className="text-xl font-semibold mb-6 flex items-center">
-                <Badge variant="outline" className="mr-2 px-3 py-1">
+              <h3 className="text-lg md:text-xl font-semibold mb-4 md:mb-6 flex items-center justify-center lg:justify-start">
+                <Badge variant="outline" className="px-3 py-1 text-sm md:text-base">
                   {category}
                 </Badge>
               </h3>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 md:gap-4">
                 {categorySkills.map((skill, skillIndex) => (
                   <ParallaxEffect key={skill.id} speed={0.02} className="h-full">
                     <div
-                      className="glass-card p-4 rounded-lg fade-in-section card-3d h-full relative overflow-hidden"
+                      className="glass-card p-3 md:p-4 rounded-lg fade-in-section card-3d h-full relative overflow-hidden"
                       style={{ animationDelay: `${0.1 * (categoryIndex + skillIndex + 1)}s` }}
                     >
                       {/* بقع الألوان الداخلية */}
-                      <div className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-blue-300/30 dark:bg-white/10 blur-xl"></div>
-                      <div className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-purple-300/30 dark:bg-white/10 blur-xl"></div>
+                      <div className="absolute -bottom-4 -right-4 md:-bottom-6 md:-right-6 w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-300/30 dark:bg-white/10 blur-xl"></div>
+                      <div className="absolute -top-4 -left-4 md:-top-6 md:-left-6 w-12 h-12 md:w-16 md:h-16 rounded-full bg-purple-300/30 dark:bg-white/10 blur-xl"></div>
 
                       <div className="text-center relative z-10">
-                        <h4 className="font-medium mb-2">{skill.name}</h4>
+                        <h4 className="font-medium mb-2 text-sm md:text-base">{skill.name}</h4>
                         <div className="skill-bar">
                           <div
                             className="skill-progress"
@@ -85,7 +85,7 @@ export default function Skills({ skills }: SkillsProps) {
                             data-width={`${skill.proficiency}%`}
                           ></div>
                         </div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 inline-block">
+                        <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 inline-block">
                           {skill.proficiency}%
                         </span>
                       </div>

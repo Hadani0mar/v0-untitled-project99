@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://mousa.org.ly",
   },
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({

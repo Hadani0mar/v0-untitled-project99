@@ -3,7 +3,7 @@ export async function ensureBucketExists(bucketName: string): Promise<{ success:
   try {
     console.log(`التحقق من وجود الدلو: ${bucketName} عبر واجهة برمجة التطبيقات`)
 
-    // Call the server API to initialize storage
+    // Call the server API to initialize storage first
     const response = await fetch("/api/storage/init", {
       method: "POST",
       headers: {
@@ -24,7 +24,25 @@ export async function ensureBucketExists(bucketName: string): Promise<{ success:
       return { success: true }
     } else {
       console.error(`الدلو ${bucketName} غير موجود في القائمة المتاحة.`)
-      return { success: false, error: `الدلو ${bucketName} غير موجود` }
+
+      // محاولة إنشاء الدلو مرة أخرى
+      console.log(`محاولة إنشاء الدلو ${bucketName} مرة أخرى...`)
+
+      const retryResponse = await fetch("/api/storage/init", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      const retryData = await retryResponse.json()
+
+      if (retryResponse.ok && retryData.buckets && retryData.buckets.includes(bucketName)) {
+        console.log(`تم إنشاء الدلو ${bucketName} بنجاح في المحاولة الثانية.`)
+        return { success: true }
+      } else {
+        return { success: false, error: `الدلو ${bucketName} غير موجود` }
+      }
     }
   } catch (error) {
     console.error(`استثناء أثناء التحقق من وجود الدلو ${bucketName}:`, error)

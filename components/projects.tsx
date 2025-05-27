@@ -34,7 +34,7 @@ export default function Projects({ projects }: ProjectsProps) {
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">تفقد بعض أعمالي الحديثة.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {projects.map((project, index) => (
             <Card
               key={project.id}
@@ -49,23 +49,27 @@ export default function Projects({ projects }: ProjectsProps) {
                   className="object-cover"
                 />
               </div>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">{project.description}</p>
+              <CardContent className="p-4 md:p-6">
+                <h3 className="text-lg md:text-xl font-semibold mb-2">{project.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm md:text-base">{project.description}</p>
               </CardContent>
-              <CardFooter className="px-6 pb-6 pt-0 flex justify-between">
-                <Button asChild variant="outline" size="sm">
-                  <a href={project.project_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 ml-2" />
-                    عرض المشروع
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="sm">
-                  <a href={project.github_url} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 ml-2" />
-                    الكود
-                  </a>
-                </Button>
+              <CardFooter className="px-4 md:px-6 pb-4 md:pb-6 pt-0 flex flex-col sm:flex-row justify-between gap-2">
+                {project.project_url && (
+                  <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                    <a href={project.project_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4 ml-2" />
+                      عرض المشروع
+                    </a>
+                  </Button>
+                )}
+                {project.github_url && (
+                  <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                    <a href={project.github_url} target="_blank" rel="noopener noreferrer">
+                      <Github className="h-4 w-4 ml-2" />
+                      الكود
+                    </a>
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           ))}

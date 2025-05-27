@@ -10,6 +10,7 @@ export default function StorageInitializer() {
   const { toast } = useToast()
 
   useEffect(() => {
+    // تحديث دالة initStorage لتحسين التعامل مع الأخطاء
     const initStorage = async () => {
       if (isLoading || isInitialized || retryCount >= 3) return
 
@@ -31,12 +32,25 @@ export default function StorageInitializer() {
         }
 
         console.log("تم تهيئة التخزين بنجاح. الدلائل المتاحة:", data.buckets)
-        setIsInitialized(true)
 
-        toast({
-          title: "تم تهيئة التخزين",
-          description: "تم تهيئة دلائل التخزين بنجاح",
-        })
+        // التحقق من وجود جميع الدلائل المطلوبة
+        const requiredBuckets = ["profile-images", "project-images", "blog-images"]
+        const missingBuckets = requiredBuckets.filter((bucket) => !data.buckets.includes(bucket))
+
+        if (missingBuckets.length > 0) {
+          console.warn("الدلائل المفقودة:", missingBuckets)
+          toast({
+            title: "تحذير",
+            description: `بعض دلائل التخزين مفقودة: ${missingBuckets.join(", ")}`,
+            variant: "default",
+          })
+        } else {
+          setIsInitialized(true)
+          toast({
+            title: "تم تهيئة التخزين",
+            description: "تم تهيئة جميع دلائل التخزين بنجاح",
+          })
+        }
       } catch (error) {
         console.error("استثناء أثناء تهيئة التخزين:", error)
 

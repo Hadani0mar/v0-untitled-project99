@@ -54,6 +54,24 @@ export async function POST() {
       console.error("استثناء عند إنشاء دلو صور المشاريع:", error)
     }
 
+    // إضافة إنشاء دلو صور المدونة بعد إنشاء دلو صور المشاريع
+
+    // إنشاء دلو لصور المدونة
+    try {
+      console.log("محاولة إنشاء دلو صور المدونة...")
+      const { data: blogBucket, error: blogError } = await supabaseAdmin.storage.createBucket("blog-images", {
+        public: true,
+      })
+
+      if (blogError && !blogError.message.includes("already exists")) {
+        console.error("خطأ في إنشاء دلو صور المدونة:", blogError)
+      } else {
+        console.log("تم إنشاء أو التحقق من وجود دلو صور المدونة")
+      }
+    } catch (error) {
+      console.error("استثناء عند إنشاء دلو صور المدونة:", error)
+    }
+
     // التحقق من قائمة الدلائل المتاحة
     const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets()
 

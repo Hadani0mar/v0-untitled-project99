@@ -16,7 +16,7 @@ export default function JsonLd({ profile, skills, projects, socialLinks }: JsonL
     jobTitle: profile.title,
     description: profile.bio,
     image: profile.avatar_url,
-    url: "https://mousaomar.com",
+    url: "https://mousa.org.ly",
     sameAs: socialLinks.map((link) => link.url),
     skills: skills.map((skill) => skill.name),
   }
@@ -41,7 +41,7 @@ export default function JsonLd({ profile, skills, projects, socialLinks }: JsonL
     "@type": "WebSite",
     name: `${profile.name} - ${profile.title}`,
     description: profile.bio,
-    url: "https://mousaomar.com",
+    url: "https://mousa.org.ly",
     author: {
       "@type": "Person",
       name: profile.name,
