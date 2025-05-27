@@ -3,7 +3,7 @@ import Hero from "@/components/hero"
 import About from "@/components/about"
 import Skills from "@/components/skills"
 import Projects from "@/components/projects"
-import Blog from "@/components/blog"
+import BlogSection from "@/components/blog-section"
 import Contact from "@/components/contact"
 import ChatButton from "@/components/chat-button"
 import ScrollToTop from "@/components/scroll-to-top"
@@ -11,7 +11,8 @@ import WelcomeMessage from "@/components/welcome-message"
 import JsonLd from "@/components/json-ld"
 import FixedHeader from "@/components/fixed-header"
 import ColorBlobs from "@/components/color-blobs"
-import type { Profile, Skill, Project, SocialLink, BlogPost } from "@/lib/types"
+import AnalyticsTracker from "@/components/analytics-tracker"
+import type { Profile, Skill, Project, SocialLink, BlogPost, BlogCategory } from "@/lib/types"
 import type { Metadata } from "next"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,43 +41,72 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+async function getAnalyticsData(supabase: any) {
+  try {
+    // جلب إجمالي مشاهدات المدونة مباشرة من Supabase
+    const { data: blogStats, error: blogError } = await supabase.from("visitor_stats").select("blog_views")
+
+    if (blogError) {
+      console.warn("لم يتم العثور على إحصائيات المدونة، سيتم إنشاء بيانات افتراضية:", blogError.message)
+
+      // إنشاء سجل افتراضي لليوم الحالي
+      const today = new Date().toISOString().split("T")[0]
+      await supabase.from("visitor_stats").upsert({
+        date: today,
+        page_views: 0,
+        unique_visitors: 0,
+        blog_views: 0,
+      })
+
+      return 0
+    }
+
+    const totalBlogViews = blogStats?.reduce((sum: number, stat: any) => sum + (stat.blog_views || 0), 0) || 0
+    return totalBlogViews
+  } catch (error) {
+    console.warn("خطأ في جلب إحصائيات المدونة، سيتم استخدام قيمة افتراضية:", error)
+    return 0
+  }
+}
+
 export default async function Home() {
   try {
     const supabase = createServerClient()
 
-    // Fetch profile data with error handling
-    const { data: profileData, error: profileError } = await supabase.from("profiles").select("*").single()
-    if (profileError) {
-      console.error("خطأ في جلب بيانات الملف الشخصي:", profileError)
-    }
+    // Fetch all data with error handling
+    const [
+      { data: profileData, error: profileError },
+      { data: skillsData, error: skillsError },
+      { data: projectsData, error: projectsError },
+      { data: socialLinksData, error: socialError },
+      { data: blogPostsData, error: blogError },
+      { data: categoriesData, error: categoriesError },
+    ] = await Promise.all([
+      supabase.from("profiles").select("*").single(),
+      supabase.from("skills").select("*").order("category"),
+      supabase.from("projects").select("*").order("created_at", { ascending: false }),
+      supabase.from("social_links").select("*").order("created_at"),
+      supabase
+        .from("blog_posts")
+        .select(`
+        *,
+        category:blog_categories(*)
+      `)
+        .eq("published", true)
+        .order("created_at", { ascending: false }),
+      supabase.from("blog_categories").select("*").order("name"),
+    ])
 
-    // Fetch skills with error handling
-    const { data: skillsData, error: skillsError } = await supabase.from("skills").select("*").order("category")
-    if (skillsError) {
-      console.error("خطأ في جلب المهارات:", skillsError)
-    }
+    // Log errors but continue with default values
+    if (profileError) console.error("خطأ في جلب بيانات الملف الشخصي:", profileError)
+    if (skillsError) console.error("خطأ في جلب المهارات:", skillsError)
+    if (projectsError) console.error("خطأ في جلب المشاريع:", projectsError)
+    if (socialError) console.error("خطأ في جلب روابط التواصل:", socialError)
+    if (blogError) console.error("خطأ في جلب مقالات المدونة:", blogError)
+    if (categoriesError) console.error("خطأ في جلب تصنيفات المدونة:", categoriesError)
 
-    // Fetch projects with error handling
-    const { data: projectsData, error: projectsError } = await supabase.from("projects").select("*")
-    if (projectsError) {
-      console.error("خطأ في جلب المشاريع:", projectsError)
-    }
-
-    // Fetch social links with error handling
-    const { data: socialLinksData, error: socialError } = await supabase.from("social_links").select("*")
-    if (socialError) {
-      console.error("خطأ في جلب روابط التواصل:", socialError)
-    }
-
-    // Fetch published blog posts with error handling
-    const { data: blogPostsData, error: blogError } = await supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-    if (blogError) {
-      console.error("خطأ في جلب مقالات المدونة:", blogError)
-    }
+    // Get analytics data directly from Supabase
+    const totalBlogViews = await getAnalyticsData(supabase)
 
     // Use default values if data is missing
     const profile = (profileData as Profile) || {
@@ -95,10 +125,12 @@ export default async function Home() {
     const projects = (projectsData as Project[]) || []
     const socialLinks = (socialLinksData as SocialLink[]) || []
     const blogPosts = (blogPostsData as BlogPost[]) || []
+    const categories = (categoriesData as BlogCategory[]) || []
 
     return (
       <>
         <JsonLd profile={profile} skills={skills} projects={projects} socialLinks={socialLinks} />
+        <AnalyticsTracker />
         <ColorBlobs />
         <FixedHeader profile={profile} />
         <ScrollToTop />
@@ -108,7 +140,7 @@ export default async function Home() {
           <About profile={profile} />
           <Skills skills={skills} />
           <Projects projects={projects} />
-          <Blog posts={blogPosts} />
+          <BlogSection posts={blogPosts} categories={categories} totalViews={totalBlogViews} />
           <Contact
             socialLinks={socialLinks}
             email="mousa.omar.com@gmail.com"

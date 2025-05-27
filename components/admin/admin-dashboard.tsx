@@ -6,13 +6,15 @@ import type { Profile, Skill, Project, SocialLink, BlogPost, BlogCategory } from
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { LogOut, User, Code, Briefcase, Link2, Bot, BookOpen } from "lucide-react"
+import { LogOut, User, Code, Briefcase, Link2, Bot, BookOpen, BarChart3, Tag } from "lucide-react"
 import ProfileForm from "./profile-form"
 import SkillsManager from "./skills-manager"
 import ProjectsManager from "./projects-manager"
 import SocialLinksManager from "./social-links-manager"
 import AiInstructionsManager from "./ai-instructions-manager"
 import BlogManager from "./blog-manager"
+import BlogCategoriesManager from "./blog-categories-manager"
+import AnalyticsDashboard from "./analytics-dashboard"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface AdminDashboardProps {
@@ -32,7 +34,7 @@ export default function AdminDashboard({
   blogPosts,
   blogCategories,
 }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("analytics")
   const { toast } = useToast()
   const router = useRouter()
   const isMobile = useMediaQuery("(max-width: 768px)")
@@ -77,7 +79,11 @@ export default function AdminDashboard({
       <main className="container mx-auto px-4 py-8 md:py-12">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-            <TabsList className={`grid ${isMobile ? "grid-cols-3 gap-2 mb-4" : "grid-cols-6"} w-full`}>
+            <TabsList className={`grid ${isMobile ? "grid-cols-2 gap-2 mb-4" : "grid-cols-4"} w-full`}>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">الإحصائيات</span>
+              </TabsTrigger>
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">الملف الشخصي</span>
@@ -90,29 +96,30 @@ export default function AdminDashboard({
                 <Briefcase className="h-4 w-4" />
                 <span className="hidden sm:inline">المشاريع</span>
               </TabsTrigger>
-              {isMobile ? null : (
-                <>
-                  <TabsTrigger value="blog" className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    <span className="hidden sm:inline">المدونة</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="social" className="flex items-center gap-2">
-                    <Link2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">روابط التواصل</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="ai" className="flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
-                    <span className="hidden sm:inline">الذكاء الاصطناعي</span>
-                  </TabsTrigger>
-                </>
-              )}
             </TabsList>
 
             {isMobile && (
-              <TabsList className="grid grid-cols-3 gap-2 w-full">
+              <TabsList className="grid grid-cols-2 gap-2 mb-4 w-full">
                 <TabsTrigger value="blog" className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden sm:inline">المدونة</span>
+                </TabsTrigger>
+                <TabsTrigger value="categories" className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  <span className="hidden sm:inline">التصنيفات</span>
+                </TabsTrigger>
+              </TabsList>
+            )}
+
+            {!isMobile && (
+              <TabsList className="grid grid-cols-4 gap-2 w-full mt-4">
+                <TabsTrigger value="blog" className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  <span className="hidden sm:inline">المدونة</span>
+                </TabsTrigger>
+                <TabsTrigger value="categories" className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  <span className="hidden sm:inline">التصنيفات</span>
                 </TabsTrigger>
                 <TabsTrigger value="social" className="flex items-center gap-2">
                   <Link2 className="h-4 w-4" />
@@ -124,7 +131,24 @@ export default function AdminDashboard({
                 </TabsTrigger>
               </TabsList>
             )}
+
+            {isMobile && (
+              <TabsList className="grid grid-cols-2 gap-2 w-full">
+                <TabsTrigger value="social" className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4" />
+                  <span className="hidden sm:inline">روابط التواصل</span>
+                </TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  <span className="hidden sm:inline">الذكاء الاصطناعي</span>
+                </TabsTrigger>
+              </TabsList>
+            )}
           </div>
+
+          <TabsContent value="analytics" className="space-y-4 animate-in">
+            <AnalyticsDashboard />
+          </TabsContent>
 
           <TabsContent value="profile" className="space-y-4 animate-in">
             <ProfileForm profile={profile} />
@@ -140,6 +164,10 @@ export default function AdminDashboard({
 
           <TabsContent value="blog" className="space-y-4 animate-in">
             <BlogManager posts={blogPosts} categories={blogCategories} />
+          </TabsContent>
+
+          <TabsContent value="categories" className="space-y-4 animate-in">
+            <BlogCategoriesManager categories={blogCategories} />
           </TabsContent>
 
           <TabsContent value="social" className="space-y-4 animate-in">
