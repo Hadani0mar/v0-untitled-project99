@@ -2,11 +2,14 @@ import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
 import { groq } from "@ai-sdk/groq"
 import { createServerClient } from "@/lib/supabase/server"
-import { lastInstructionsUpdate } from "../ai/reset-cache/route"
+
+// إزالة الاستيراد المشكوك فيه
+// import { lastInstructionsUpdate } from "../ai/reset-cache/route"
 
 // ذاكرة تخزين مؤقت للتعليمات
 let cachedInstructions: string | null = null
 let cacheTimestamp = 0
+const lastInstructionsUpdate = Date.now()
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
       }
     } else {
       // استخدام التعليمات المخزنة مؤقتًا
-      systemPrompt = cachedInstructions
+      systemPrompt = cachedInstructions || systemPrompt
     }
 
     // تحقق من وجود مفتاح API لـ Groq
