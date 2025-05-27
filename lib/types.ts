@@ -54,12 +54,9 @@ export interface BlogPost {
   excerpt?: string
   featured_image_url?: string
   published: boolean
-  category_id?: string
-  views?: number
-  reading_time?: number
   created_at: string
   updated_at: string
-  category?: BlogCategory
+  categories?: BlogCategory[]
 }
 
 export interface BlogCategory {
@@ -67,17 +64,5 @@ export interface BlogCategory {
   name: string
   slug: string
   description?: string
-  color?: string
   created_at: string
-  updated_at: string
-}
-
-export interface VisitorStats {
-  id: string
-  page_views: number
-  unique_visitors: number
-  blog_views: number
-  date: string
-  created_at: string
-  updated_at: string
 }

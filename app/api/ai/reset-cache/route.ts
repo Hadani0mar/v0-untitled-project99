@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
 // متغير عام لتتبع وقت آخر تحديث للتعليمات
-export let lastInstructionsUpdate = Date.now()
+let lastInstructionsUpdate = Date.now()
 
 export async function POST() {
   try {
@@ -18,7 +18,5 @@ export async function POST() {
   }
 }
 
-// دالة للحصول على آخر تحديث
-export function getLastInstructionsUpdate() {
-  return lastInstructionsUpdate
-}
+// تصدير المتغير العام لاستخدامه في ملفات أخرى
+export { lastInstructionsUpdate }

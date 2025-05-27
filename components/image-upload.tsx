@@ -83,9 +83,6 @@ export default function ImageUpload({
 
       console.log("تم تحميل الملف بنجاح:", result)
 
-      // تنظيف معاينة محلية
-      URL.revokeObjectURL(localPreview)
-
       // استدعاء الدالة المرجعية مع عنوان URL الجديد
       onUploadComplete(result.publicUrl)
 
@@ -111,16 +108,7 @@ export default function ImageUpload({
     <div className="space-y-4">
       {previewUrl && (
         <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden">
-          <Image
-            src={previewUrl || "/placeholder.svg"}
-            alt="صورة المستخدم"
-            fill
-            className="object-cover"
-            onError={() => {
-              console.error("خطأ في تحميل الصورة:", previewUrl)
-              setPreviewUrl("/placeholder.svg?height=128&width=128")
-            }}
-          />
+          <Image src={previewUrl || "/placeholder.svg"} alt="صورة المستخدم" fill className="object-cover" />
         </div>
       )}
 
